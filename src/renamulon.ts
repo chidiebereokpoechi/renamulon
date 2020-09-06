@@ -2,23 +2,21 @@ import * as fs from 'fs'
 import { endsWith, forEach, forEachRight, last, map, replace, some } from 'lodash'
 import * as path from 'path'
 import * as yargs from 'yargs'
+import { DEFAULT_EXTENSIONS, FORMAT_CHOICES } from './constants'
 import { Formatter } from './formatter'
 import { Format } from './types'
-
-const formatChoices: ReadonlyArray<Format> = ['camel', 'kebab', 'pascal', 'snake']
-const defaultExtensions = ['ts', 'tsx', 'js', 'jsx']
 
 const { argv } = yargs
   .usage(`Usage: $0 <directory> [-f format]`)
   .demandCommand(1, 'Enter a root directory')
   .option('format', {
     alias: 'f',
-    choices: formatChoices,
+    choices: FORMAT_CHOICES,
     demandOption: true,
   })
   .option('ext', {
     alias: 'x',
-    default: defaultExtensions,
+    default: DEFAULT_EXTENSIONS,
     array: true,
   })
   .option('remove-dots', {
@@ -96,7 +94,7 @@ export class Renamulon {
       return
     }
 
-    // console.log(before + ' --> ' + after)
+    console.log(before + ' --> ' + after)
 
     if (notPaths) {
       return

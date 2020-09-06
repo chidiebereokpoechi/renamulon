@@ -2,10 +2,17 @@
   "name": "renamulon",
   "version": "0.0.1",
   "description": "Bulk file renamer for typescript and javascript files",
-  "main": "lib/index.js",
+  "main": "lib/renamulon.js",
   "bin": {
-    "renamulon": "lib/index.js"
+    "renamulon": "lib/renamulon.js"
   },
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chidiebereokpoechi/renamulon.git"
+  },
+  "homepage": "https://github.com/chidiebereokpoechi/renamulon",
+  "bugs": "https://github.com/chidiebereokpoechi/renamulon/issues",
   "scripts": {
     "test": "jest",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -55,10 +62,10 @@
     "yargs": "^15.4.1"
   },
   "engines": {
-    "node": "> 10"
+    "node": ">= 10.0.0"
   },
   "preferGlobal": true,
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://registry.npmjs.org/"
   }
 }
