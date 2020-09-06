@@ -1,29 +1,48 @@
+import { execSync } from 'child_process'
 import * as fs from 'fs'
-import { endsWith, forEach, forEachRight, last, map, replace, some } from 'lodash'
+import {
+  endsWith,
+  forEach,
+  forEachRight,
+  includes,
+  last,
+  map,
+  replace,
+  some,
+  startsWith,
+} from 'lodash'
 import * as path from 'path'
 import * as yargs from 'yargs'
-import { DEFAULT_EXTENSIONS, FORMAT_CHOICES } from './constants'
+import { DEFAULT_EXTENSIONS, EXCLUDED_FOLDERS, FORMAT_CHOICES } from './constants'
 import { Formatter } from './formatter'
 import { Format } from './types'
 
 const { argv } = yargs
-  .usage(`Usage: $0 <directory> [-f format]`)
+  .usage(`Usage: $0 <directory> [-f format] [-x extensions] [-r] [-d] [-g]`)
   .demandCommand(1, 'Enter a root directory')
   .option('format', {
     alias: 'f',
     choices: FORMAT_CHOICES,
     demandOption: true,
+    desc: 'Format type',
   })
   .option('ext', {
     alias: 'x',
     default: DEFAULT_EXTENSIONS,
     array: true,
+    desc: 'File extensions to include in renaming',
   })
   .option('remove-dots', {
     alias: 'r',
     type: 'boolean',
     default: false,
     desc: 'Modify dot structure',
+  })
+  .option('use-git', {
+    alias: '-g',
+    type: 'boolean',
+    default: false,
+    desc: 'Use git mv instead of mv',
   })
   .option('dry', {
     alias: 'd',
@@ -37,6 +56,7 @@ export class Renamulon {
   private static format: Format = 'kebab'
   private static removeDots: boolean = true
   private static dry: boolean = false
+  private static useGit: boolean = false
   private static root: string = '.'
 
   private static dirs: string[] = []
@@ -47,6 +67,7 @@ export class Renamulon {
     this.extensions = argv.ext
     this.format = argv.format
     this.removeDots = argv['remove-dots']
+    this.useGit = argv['use-git']
     this.dry = argv.dry
     this.root = path.resolve(process.cwd(), argv._[0])
 
@@ -71,6 +92,7 @@ export class Renamulon {
     }
 
     forEach(dirents, (dirent) => {
+      if (startsWith(dirent.name, '.') || includes(EXCLUDED_FOLDERS, dirent.name)) return
       const absolute = path.resolve(start, dirent.name)
 
       if (dirent.isDirectory()) {
@@ -89,12 +111,23 @@ export class Renamulon {
     return path.resolve(dir, [name, ext].join(''))
   }
 
-  public static update(before: string, after: string, notPaths?: boolean): void {
-    if (before === after) {
+  public static rename(from: string, to: string): void {
+    if (this.useGit) {
+      execSync(`git add ${from}`, { cwd: this.root })
+      execSync(`git mv ${from} ${from}-temp`, { cwd: this.root })
+      execSync(`git mv ${from}-temp ${to}`, { cwd: this.root })
       return
     }
 
-    console.log(before + ' --> ' + after)
+    fs.renameSync(from, to)
+  }
+
+  public static update(from: string, to: string, notPaths?: boolean): void {
+    if (from === to) {
+      return
+    }
+
+    console.log(from + ' --> ' + to)
 
     if (notPaths) {
       return
@@ -104,7 +137,7 @@ export class Renamulon {
       return
     }
 
-    fs.renameSync(before, after)
+    this.rename(from, to)
   }
 
   public static renameDirs(): void {

@@ -35,6 +35,7 @@ beforeAll(() => {
   }
 
   fs.mkdirSync(`${BASE}/fIle-S/util`, { recursive: true })
+  execSync(`git init`, { cwd: BASE })
   fs.writeFileSync(APP_FILE_SRC, APP_ORIGINAL, { encoding: 'utf8' })
   fs.writeFileSync(HISTORY_FILE_SRC, HISTORY_ORIGINAL, { encoding: 'utf8' })
   fs.writeFileSync(INDEX_FILE_SRC, INDEX_ORIGINAL, { encoding: 'utf8' })
