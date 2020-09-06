@@ -1,6 +1,6 @@
 {
   "name": "renamulon",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Bulk file renamer for typescript and javascript files",
   "main": "lib/renamulon.js",
   "bin": {
