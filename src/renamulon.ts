@@ -116,9 +116,9 @@ export class Renamulon {
 
   public static rename(from: string, to: string): void {
     if (this.useGit) {
-      execSync(`git add ${from}`, { cwd: this.root })
-      execSync(`git mv ${from} ${from}-temp`, { cwd: this.root })
-      execSync(`git mv ${from}-temp ${to}`, { cwd: this.root })
+      execSync(`git add "${from}"`, { cwd: this.root })
+      execSync(`git mv "${from}" "${from}-temp"`, { cwd: this.root })
+      execSync(`git mv "${from}-temp" "${to}"`, { cwd: this.root })
       return
     }
 
@@ -130,7 +130,7 @@ export class Renamulon {
       return
     }
 
-    console.log(from + ' --> ' + to)
+    process.stdout.write(from + ' --> ' + to + '\n')
 
     if (notPaths || this.dry) {
       return
@@ -169,7 +169,6 @@ export class Renamulon {
   }
 
   public static checkImports(): void {
-    console.table(this.dirs)
     forEach(this.files, (file) => {
       const { dir, name, ext } = path.parse(file)
       const filePath = this.buildFileName(dir, name, ext)
