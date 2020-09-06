@@ -15,8 +15,8 @@ npx renamulon src -f snake -x ts tsx --dry -r
 ```
 
 Options:
-- `<directory>` specifies the directory to start the file renaming.
-- `--format`, `-f` is an option that specifies the format style for the file names. The options are `kebab`, `camel`, `pascal`, and `snake`. The default value is `kebab`. 
+- `<directory>` specifies the directory to start the file renaming. *REQUIRED*
+- `--format`, `-f` is an option that specifies the format style for the file names. The options are `kebab`, `camel`, `pascal`, and `snake`. *REQUIRED* 
 - `--ext`, `-x` is an option that specifies the list of file extensions to include in the renaming. The default value is `js jsx ts tsx`.
 
 Flags:

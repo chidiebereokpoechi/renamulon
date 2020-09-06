@@ -77,6 +77,11 @@ export class Renamulon {
       if (!fs.existsSync(this.root)) throw new Error('Directory does not exist')
       if (!fs.lstatSync(this.root).isDirectory())
         throw new Error(`"${this.root}" is not a directory`)
+
+      if (this.useGit) {
+        execSync(`git status`, { cwd: this.root })
+      }
+
       this.readFoldersRecur(this.root)
       this.renameFiles()
       this.checkImports()
@@ -115,10 +120,14 @@ export class Renamulon {
   }
 
   public static rename(from: string, to: string): void {
+    if (fs.existsSync(to)) {
+      throw new Error(`Destination ${to} already exists`)
+    }
+
     if (this.useGit) {
-      execSync(`git add "${from}"`, { cwd: this.root })
-      execSync(`git mv "${from}" "${from}-temp"`, { cwd: this.root })
-      execSync(`git mv "${from}-temp" "${to}"`, { cwd: this.root })
+      execSync(`git rm -r --ignore-unmatch "${to}"`, { cwd: this.root })
+      execSync(`git mv -f "${from}" "${from}-temp"`, { cwd: this.root })
+      execSync(`git mv -f "${from}-temp" "${to}"`, { cwd: this.root })
       return
     }
 
@@ -181,51 +190,37 @@ export class Renamulon {
     const contents = fs.readFileSync(filePath, 'utf8')
     let updates: number = 0
 
-    const updated = replace(
-      contents,
-      /(((?:import)|(?:export)) (?:.+) from (\'|\")\.(.+)(\'|\"))/g,
-      (original) => {
-        const imports = original.split(/\s+/)
-        let name = last(imports) as string
-        const quoteMark = last(name) as string
-        name = name.slice(1, name.length - 1)
-        const absolute = path.resolve(dir, name)
+    const updated = replace(contents, /from[\s\n]*['"](\..+)['"]/g, (original, name: string) => {
+      const absolute = path.resolve(dir, name)
+      let file: fs.Stats | undefined
 
-        if (fs.existsSync(absolute)) {
-          const file = fs.lstatSync(absolute)
+      if (fs.existsSync(absolute)) {
+        file = fs.lstatSync(absolute)
+      }
 
-          if (file.isFile()) {
-            const combos = this.extensions.map((extension) => `${absolute}.${extension}`)
+      if (file?.isFile()) {
+        const combos = this.extensions.map((extension) => `${absolute}.${extension}`)
 
-            if (!some(combos, (combo) => this.renamed[combo])) {
-              return original
-            }
-          }
-
-          if (file.isDirectory() && !includes(this.dirs, absolute)) {
-            return original
-          }
-        }
-
-        const formatted = map(name.split('/'), (part) =>
-          Formatter.format(part, this.format, this.removeDots),
-        ).join('/')
-
-        if (formatted === name) {
+        if (!some(combos, (combo) => this.renamed[combo])) {
           return original
         }
+      } else if (file && !includes(this.dirs, absolute)) {
+        return original
+      }
 
-        const update = [
-          ...imports.slice(0, imports.length - 1),
-          quoteMark + formatted + quoteMark,
-        ].join(' ')
+      const formatted = map(name.split('/'), (part) =>
+        Formatter.format(part, this.format, this.removeDots),
+      ).join('/')
 
-        this.update(original, update, true)
+      if (formatted === name) {
+        return original
+      }
 
-        updates++
-        return update
-      },
-    )
+      const update = original.replace(name, formatted)
+      this.update(original, update, true)
+      updates++
+      return update
+    })
 
     if (updates === 0 || this.dry) {
       return
