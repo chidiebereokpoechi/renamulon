@@ -56,5 +56,8 @@
   "engines": {
     "node": "> 10"
   },
-  "preferGlobal": true
+  "preferGlobal": true,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }
