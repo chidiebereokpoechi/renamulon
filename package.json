@@ -1,0 +1,59 @@
+{
+  "name": "renamulon",
+  "version": "0.0.1",
+  "description": "Bulk file renamer for typescript and javascript files",
+  "main": "lib/index.js",
+  "bin": {
+    "renamulon": "lib/index.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "keywords": [
+    "bulk",
+    "rename",
+    "renamer",
+    "file",
+    "directory",
+    "node",
+    "typescript",
+    "javascript"
+  ],
+  "author": "Chidiebere Okpoechi",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^26.0.9",
+    "@types/lodash": "^4.14.161",
+    "@types/node": "^14.6.4",
+    "@types/nodemailer": "^6.4.0",
+    "@types/yargs": "^15.0.5",
+    "jest": "^26.2.2",
+    "nodemailer": "^6.4.11",
+    "prettier": "^2.0.5",
+    "ts-jest": "^26.1.4",
+    "ts-node": "^9.0.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.9.7"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "lodash": "^4.17.20",
+    "yargs": "^15.4.1"
+  },
+  "engines": {
+    "node": "> 10"
+  }
+}

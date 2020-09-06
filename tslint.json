@@ -1,0 +1,30 @@
+{
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "jsRules": {
+    "no-unused-expression": true
+  },
+  "rules": {
+    "variable-name": false,
+    "quotemark": [true, "single", "jsx-double"],
+    "member-access": [true],
+    "ordered-imports": [true, "lowercase-first"],
+    "max-line-length": [true, 150],
+    "member-ordering": [false],
+    "interface-name": [false],
+    "arrow-parens": false,
+    "ban-types": false,
+    "semicolon": false,
+    "no-console": false,
+    "no-shadowed-variable": false,
+    "max-classes-per-file": true,
+    "no-empty": true,
+    "trailing-comma": [true, "all"],
+    "no-conditional-assignment": false,
+    "only-arrow-functions": true,
+    "object-literal-sort-keys": false,
+    "typedef": [true, "call-signature", "property-declaration"]
+  },
+  "rulesDirectory": [],
+  "exclude": ["node_modules/**/*.js", "node_modules/**/*.ts"]
+}
