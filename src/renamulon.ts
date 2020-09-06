@@ -63,7 +63,7 @@ export class Renamulon {
 
   private static dirs: string[] = []
   private static files: string[] = []
-  private static updatedFiles: Record<string, boolean> = {}
+  private static renamed: Record<string, boolean> = {}
 
   public static main(): void {
     this.extensions = argv.ext
@@ -99,12 +99,13 @@ export class Renamulon {
 
       if (dirent.isDirectory()) {
         this.dirs.push(absolute)
+        this.renamed[absolute] = false
         return this.readFoldersRecur(absolute)
       }
 
       if (some(this.extensions, (ext) => endsWith(dirent.name, ext))) {
         this.files.push(absolute)
-        this.updatedFiles[absolute] = false
+        this.renamed[absolute] = false
       }
     })
   }
@@ -131,11 +132,7 @@ export class Renamulon {
 
     console.log(from + ' --> ' + to)
 
-    if (notPaths) {
-      return
-    }
-
-    if (this.dry) {
+    if (notPaths || this.dry) {
       return
     }
 
@@ -143,10 +140,11 @@ export class Renamulon {
   }
 
   public static renameDirs(): void {
-    forEachRight(this.dirs, (_dir) => {
-      const { dir, name: original } = path.parse(_dir)
+    forEachRight(this.dirs, (dir) => {
+      const { dir: _dir, name: original } = path.parse(dir)
       const formatted = Formatter.format(original, this.format, this.removeDots)
-      this.update(_dir, path.resolve(dir, formatted))
+      this.renamed[dir] = true
+      this.update(dir, path.resolve(_dir, formatted))
     })
   }
 
@@ -164,13 +162,14 @@ export class Renamulon {
         ext,
       )
 
-      this.updatedFiles[file] = true
+      this.renamed[file] = true
       this.files[i] = this.dry ? file : formatted
       this.update(file, path.resolve(dir, formatted))
     })
   }
 
   public static checkImports(): void {
+    console.table(this.dirs)
     forEach(this.files, (file) => {
       const { dir, name, ext } = path.parse(file)
       const filePath = this.buildFileName(dir, name, ext)
@@ -194,13 +193,19 @@ export class Renamulon {
         const absolute = path.resolve(dir, name)
 
         if (fs.existsSync(absolute)) {
-          return original
-        }
+          const file = fs.lstatSync(absolute)
 
-        const combos = this.extensions.map((extension) => `${absolute}.${extension}`)
+          if (file.isFile()) {
+            const combos = this.extensions.map((extension) => `${absolute}.${extension}`)
 
-        if (!some(combos, (combo) => this.updatedFiles[combo])) {
-          return original
+            if (!some(combos, (combo) => this.renamed[combo])) {
+              return original
+            }
+          }
+
+          if (file.isDirectory() && !includes(this.dirs, absolute)) {
+            return original
+          }
         }
 
         const formatted = map(name.split('/'), (part) =>
