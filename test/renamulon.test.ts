@@ -23,7 +23,7 @@ import {
   UTIL_INDEX_SNAKE,
 } from './files'
 
-const BASE = 'EXAMPLE'
+const BASE = 'EXAMPLE_FOLDER'
 const APP_FILE_SRC = `${BASE}/fIle-S/App.tsx`
 const HISTORY_FILE_SRC = `${BASE}/fIle-S/util/history.ts`
 const INDEX_FILE_SRC = `${BASE}/fIle-S/index.tsx`
@@ -35,7 +35,6 @@ beforeAll(() => {
   }
 
   fs.mkdirSync(`${BASE}/fIle-S/util`, { recursive: true })
-  execSync(`git init`, { cwd: BASE })
   fs.writeFileSync(APP_FILE_SRC, APP_ORIGINAL, { encoding: 'utf8' })
   fs.writeFileSync(HISTORY_FILE_SRC, HISTORY_ORIGINAL, { encoding: 'utf8' })
   fs.writeFileSync(INDEX_FILE_SRC, INDEX_ORIGINAL, { encoding: 'utf8' })
@@ -55,8 +54,8 @@ test('Files are set', () => {
 })
 
 describe('Renamulon', () => {
-  it('should rename files to camel case', () => {
-    expect(execSync(`ts-node src/renamulon ${BASE} -f camel`)).toBeTruthy()
+  it('should rename files to camel case with git', () => {
+    expect(execSync(`ts-node src/renamulon ${BASE} -g -f camel`)).toBeTruthy()
 
     expect(fs.existsSync(`${BASE}/fIleS/app.tsx`)).toBeTruthy()
     expect(fs.existsSync(`${BASE}/fIleS/util/history.ts`)).toBeTruthy()
@@ -70,7 +69,7 @@ describe('Renamulon', () => {
   })
 
   it('should rename files to kebab case', () => {
-    expect(execSync(`ts-node src/renamulon ${BASE} -f kebab`)).toBeTruthy()
+    expect(execSync(`ts-node src/renamulon ${BASE} -g -f kebab`)).toBeTruthy()
 
     expect(fs.existsSync(`${BASE}/f-ile-s/app.tsx`)).toBeTruthy()
     expect(fs.existsSync(`${BASE}/f-ile-s/util/history.ts`)).toBeTruthy()
@@ -84,7 +83,7 @@ describe('Renamulon', () => {
   })
 
   it('should rename files to snake case', () => {
-    expect(execSync(`ts-node src/renamulon ${BASE} -f snake`)).toBeTruthy()
+    expect(execSync(`ts-node src/renamulon ${BASE} -g -f snake`)).toBeTruthy()
 
     expect(fs.existsSync(`${BASE}/f_ile_s/app.tsx`)).toBeTruthy()
     expect(fs.existsSync(`${BASE}/f_ile_s/util/history.ts`)).toBeTruthy()
@@ -98,7 +97,7 @@ describe('Renamulon', () => {
   })
 
   it('should rename files to pascal case', () => {
-    expect(execSync(`ts-node src/renamulon ${BASE} -f pascal`)).toBeTruthy()
+    expect(execSync(`ts-node src/renamulon ${BASE} -g -f pascal`)).toBeTruthy()
 
     expect(fs.existsSync(`${BASE}/FIleS/App.tsx`)).toBeTruthy()
     expect(fs.existsSync(`${BASE}/FIleS/Util/History.ts`)).toBeTruthy()

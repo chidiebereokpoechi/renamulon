@@ -6,4 +6,3 @@ yarn-error.log*
 .nyc_output
 lib
 lib_test
-EXAMPLE

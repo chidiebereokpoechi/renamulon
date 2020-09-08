@@ -1,6 +1,6 @@
 {
   "name": "renamulon",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Bulk file renamer for typescript and javascript files",
   "main": "lib/renamulon.js",
   "bin": {
@@ -29,11 +29,17 @@
     "bulk",
     "rename",
     "renamer",
+    "case",
+    "casing",
     "file",
     "directory",
     "node",
     "typescript",
-    "javascript"
+    "javascript",
+    "kebab",
+    "pascal",
+    "camel",
+    "snake"
   ],
   "author": "Chidiebere Okpoechi",
   "license": "MIT",

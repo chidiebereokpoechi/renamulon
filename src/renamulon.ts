@@ -119,19 +119,29 @@ export class Renamulon {
     return path.resolve(dir, [name, ext].join(''))
   }
 
-  public static rename(from: string, to: string): void {
+  public static rename(from: string, to: string, isFolder?: boolean): void {
     if (fs.existsSync(to)) {
       throw new Error(`Destination ${to} already exists`)
     }
 
     if (this.useGit) {
+      from = path.relative(this.root, from)
+      to = path.relative(this.root, to)
+      const pathBlob = isFolder ? path.sep + '*' : ''
+
+      // console.log({ from, to })
+      // execSync(`mv "${from}" "${from}-temp"`, { cwd: this.root })
+      // execSync(`mv "${from}-temp" "${to}"`, { cwd: this.root })
+
+      execSync(`git add "${from}"`, { cwd: this.root })
       execSync(`git rm -r --ignore-unmatch "${to}"`, { cwd: this.root })
-      execSync(`git mv -f "${from}" "${from}-temp"`, { cwd: this.root })
-      execSync(`git mv -f "${from}-temp" "${to}"`, { cwd: this.root })
+      execSync(`git mv -f "${from}${pathBlob}" "${from}-temp"`, { cwd: this.root })
+      execSync(`git mv -f "${from}-temp${pathBlob}" "${to}"`, { cwd: this.root })
       return
     }
 
-    fs.renameSync(from, to)
+    fs.renameSync(from, `${from}-temp`)
+    fs.renameSync(`${from}-temp`, to)
   }
 
   public static update(from: string, to: string, notPaths?: boolean): void {
